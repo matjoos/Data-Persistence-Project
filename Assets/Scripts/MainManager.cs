@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public string PlayerName;
     [SerializeField] private int NumberOfScores = 3;
 
+    [Serializable]
     public class Highscore
     {
         public string PlayerName;
@@ -27,13 +28,8 @@ public class MainManager : MonoBehaviour
     {
         if (Instance == null)
         {
-            // Initialize highscore array
-            HighscoreTable = new Highscore[NumberOfScores];
-
-            for (int i = 0; i < HighscoreTable.Length; i++)
-            {
-                HighscoreTable[i] = new Highscore();
-            }
+            //Initialize highscore table
+            HighscoreTable = InitializeHighscoreTable(HighscoreTable);
 
             // Create persistent singleton
             Instance = this;
@@ -44,14 +40,15 @@ public class MainManager : MonoBehaviour
         }
     }
 
-    public void SaveHighScore()
+    public void SaveHighscore()
     {
         SaveData saveData = new SaveData();
+        saveData.HighscoreTable = InitializeHighscoreTable(saveData.HighscoreTable);
         saveData.HighscoreTable = HighscoreTable;
 
-        string HighscoreTableJSON = JsonUtility.ToJson(saveData.HighscoreTable);
+        string json = JsonUtility.ToJson(saveData);
 
-        File.WriteAllText(Application.persistentDataPath + "/highscore.json", HighscoreTableJSON);
+        File.WriteAllText(Application.persistentDataPath + "/highscore.json", json);
     }
 
     public void LoadHighscore()
@@ -60,18 +57,26 @@ public class MainManager : MonoBehaviour
 
         if (File.Exists(filePath))
         {
-            string HighscoreTableJSON = File.ReadAllText(filePath);
-            SaveData saveData = new SaveData();
+            string json = File.ReadAllText(filePath);
 
-            saveData.HighscoreTable = JsonUtility.FromJson<Highscore[]>(HighscoreTableJSON);
+            SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
-            for (int i = 0; i < saveData.HighscoreTable.Length; i++)
+            if (saveData.HighscoreTable != null)
             {
-                if (saveData.HighscoreTable[i] != null)
-                {
-                    HighscoreTable[i] = saveData.HighscoreTable[i];
-                }
+                HighscoreTable = saveData.HighscoreTable;
             }
         }
+    }
+
+    private Highscore[] InitializeHighscoreTable(Highscore[] Table)
+    {
+        Table = new Highscore[NumberOfScores];
+
+        for (int i = 0; i < Table.Length; i++)
+        {
+            Table[i] = new Highscore();
+        }
+
+        return Table;
     }
 }

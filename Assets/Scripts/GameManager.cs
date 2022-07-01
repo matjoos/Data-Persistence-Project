@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(m_WaitBeforeHighscore);
         AddScoreToHighscoreTable(m_Points, MainManager.Instance.PlayerName);
-        MainManager.Instance.SaveHighScore();
+        MainManager.Instance.SaveHighscore();
         SceneManager.LoadScene("highscore");
     }
 
