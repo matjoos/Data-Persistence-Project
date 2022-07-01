@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class MainManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     public Brick BrickPrefab;
     public int LineCount = 6;
@@ -17,6 +17,8 @@ public class MainManager : MonoBehaviour
     private int m_Points;
     
     private bool m_GameOver = false;
+
+    private float m_WaitBeforeHighscore = 3.0f; //seconds
 
     
     // Start is called before the first frame update
@@ -55,11 +57,19 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
+            StartCoroutine(WaitAndGoToHighscore());
+
+            //if (Input.GetKeyDown(KeyCode.Space))
+            //{
+            //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            //}
         }
+    }
+
+    private IEnumerator WaitAndGoToHighscore()
+    {
+        yield return new WaitForSeconds(m_WaitBeforeHighscore);
+        SceneManager.LoadScene("highscore");
     }
 
     void AddPoint(int point)
