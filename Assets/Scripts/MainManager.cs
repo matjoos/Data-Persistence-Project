@@ -7,8 +7,9 @@ using UnityEngine;
 public class MainManager : MonoBehaviour
 {
     public static MainManager Instance;
-    public Highscore[] HighscoreTable = new Highscore[3];
+    public Highscore[] HighscoreTable;
     public string PlayerName;
+    [SerializeField] private int NumberOfScores = 3;
 
     public class Highscore
     {
@@ -17,7 +18,7 @@ public class MainManager : MonoBehaviour
     }
 
     [Serializable]
-    class SaveData
+    private class SaveData
     {
         public Highscore[] HighscoreTable;
     }
@@ -26,36 +27,51 @@ public class MainManager : MonoBehaviour
     {
         if (Instance == null)
         {
+            // Initialize highscore array
+            HighscoreTable = new Highscore[NumberOfScores];
+
+            for (int i = 0; i < HighscoreTable.Length; i++)
+            {
+                HighscoreTable[i] = new Highscore();
+            }
+
+            // Create persistent singleton
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            //Load highscores
             LoadHighscore();
         }
     }
 
     public void SaveHighScore()
     {
-        //Debug.Log("SaveHighscore()");
-
         SaveData saveData = new SaveData();
         saveData.HighscoreTable = HighscoreTable;
 
-        string HighscoreTableJSON = JsonUtility.ToJson(saveData);
+        string HighscoreTableJSON = JsonUtility.ToJson(saveData.HighscoreTable);
 
         File.WriteAllText(Application.persistentDataPath + "/highscore.json", HighscoreTableJSON);
     }
 
     public void LoadHighscore()
     {
-        //Debug.Log("LoadHighscore()");
-
-        string filePath = Application.persistentDataPath + "/savefile.json";
+        string filePath = Application.persistentDataPath + "/highscore.json";
 
         if (File.Exists(filePath))
         {
             string HighscoreTableJSON = File.ReadAllText(filePath);
-            SaveData saveData = JsonUtility.FromJson<SaveData>(HighscoreTableJSON);
+            SaveData saveData = new SaveData();
 
-            HighscoreTable = saveData.HighscoreTable;
+            saveData.HighscoreTable = JsonUtility.FromJson<Highscore[]>(HighscoreTableJSON);
+
+            for (int i = 0; i < saveData.HighscoreTable.Length; i++)
+            {
+                if (saveData.HighscoreTable[i] != null)
+                {
+                    HighscoreTable[i] = saveData.HighscoreTable[i];
+                }
+            }
         }
     }
 }

@@ -39,16 +39,6 @@ public class GameManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
-
-        ShowHighscore();
-    }
-
-    private void ShowHighscore()
-    {
-        string PlayerName = MainManager.Instance.PlayerName;
-
-        HighscoreText.text = $"Best Score : {PlayerName} : {m_Points}";
-        // Put own name and score when highscore surpassed
     }
 
     private void Update()
@@ -68,16 +58,34 @@ public class GameManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            AddScoreToHighscoreTable();
-            MainManager.Instance.SaveHighScore();
             StartCoroutine(WaitAndGoToHighscore());
         }
+
+        ShowHighscore();
     }
 
     private IEnumerator WaitAndGoToHighscore()
     {
         yield return new WaitForSeconds(m_WaitBeforeHighscore);
+        AddScoreToHighscoreTable(m_Points, MainManager.Instance.PlayerName);
+        MainManager.Instance.SaveHighScore();
         SceneManager.LoadScene("highscore");
+    }
+
+    private void ShowHighscore()
+    {
+        string PlayerName = MainManager.Instance.PlayerName;
+        int HighscoreScore = MainManager.Instance.HighscoreTable[0].Score;
+        string HighscorePlayer = MainManager.Instance.HighscoreTable[0].PlayerName;
+
+        if (m_Points <= HighscoreScore)
+        {
+            HighscoreText.text = $"Best Score : {HighscorePlayer} : {HighscoreScore}";
+        }
+        else
+        {
+            HighscoreText.text = $"Best Score : {PlayerName} : {m_Points}";
+        }
     }
 
     void AddPoint(int point)
@@ -92,12 +100,28 @@ public class GameManager : MonoBehaviour
         GameOverText.SetActive(true);
     }
 
-    private void AddScoreToHighscoreTable()
+    private void AddScoreToHighscoreTable(int score, string playerName)
     {
-        // Check if score is high enough and add it in the right position,
-        // moving other scores down if neccesary.
+        string playerToBump;
+        int scoreToBump;
+       
+        for (int i = 0; i < MainManager.Instance.HighscoreTable.Length; i++)
+        {
+            // Check if the player scored better than the three highscores
+            if (score > MainManager.Instance.HighscoreTable[i].Score)
+            {
+                // Save the data of the surpassed player in variables
+                playerToBump = MainManager.Instance.HighscoreTable[i].PlayerName;
+                scoreToBump = MainManager.Instance.HighscoreTable[i].Score;
 
-        // m_Points
-        // PlayerName from MainManager
+                // Add score to the highscore table
+                MainManager.Instance.HighscoreTable[i].PlayerName = playerName;
+                MainManager.Instance.HighscoreTable[i].Score = score;
+                  
+                // Put surpassed player in existing variables to bump down the list
+                playerName = playerToBump;
+                score = scoreToBump;
+            }
+        }
     }
 }

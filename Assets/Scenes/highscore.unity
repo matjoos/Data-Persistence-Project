@@ -1869,7 +1869,7 @@ GameObject:
   - component: {fileID: 1891856979}
   - component: {fileID: 1891856978}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Menu Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2107,3 +2107,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e2f265a72e4646d689d06265488f900, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NameTable:
+  - {fileID: 902925830}
+  - {fileID: 1303334132}
+  - {fileID: 432159418}
+  ScoreTable:
+  - {fileID: 439546326}
+  - {fileID: 695960757}
+  - {fileID: 1101281192}
